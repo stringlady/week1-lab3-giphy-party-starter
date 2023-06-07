@@ -1,5 +1,13 @@
 // Global Constants
-const apiKey = "MY_API_KEY"
+const apiKey = "U2M3MZsxHNUWLHygMueNTgvcKi5KbB7z"
+const searchForm = document.getElementById("search-form");
+const searchButton = document.getElementById("search-button");
+const searchInput = document.getElementById("search-input");
+const display = document.getElementById("display");
+const limit = 8;
+const loadButton = document.querySelector(".hidden");
+var page_num = 0;
+var offset = 0;
 
 /**
  * Update the DOM to display results from the Giphy API query.
@@ -9,7 +17,12 @@ const apiKey = "MY_API_KEY"
  *
  */
 function displayResults(results) {
-  // YOUR CODE HERE
+  console.log(results);
+    display.innerHTML += `
+    <div class="all">
+      <img class="image" src="${results.images.original.url}">
+      </div>
+   `
 }
 
 /**
@@ -20,7 +33,17 @@ function displayResults(results) {
  *
  */
 async function getGiphyApiResults(searchTerm) {
-  // YOUR CODE HERE
+  //const url = "https://api.giphy.com/v1/gifs/search?api_key=".concat(apiKey, "&q=", searchTerm, "&limit=", limit, "&offset=", offset, "&rating=g&lang=en");
+  const url = `http://api.giphy.com/v1/gifs/search?q=${searchTerm}&api_key=${apiKey}&limit=${limit}&rating=g&lang=en&offset=${offset}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  data.data.forEach(element => {
+    displayResults(element);
+  });
+  //console.log(data.data);
+  //console.log(displayResults(data));
+  //displayResults(data);
+  //return neW;
 }
 
 /**
@@ -30,10 +53,14 @@ async function getGiphyApiResults(searchTerm) {
  *
  */
 async function handleFormSubmit(event) {
-  // YOUR CODE HERE
+  event.preventDefault();
+  display.innerHTML = '';
+  //displayResults(getGiphyApiResults(searchInput.value));
+  getGiphyApiResults(searchInput.value);
+  loadButton.classList.remove("hidden");
 }
 
-// searchForm.addEventListener("submit", handleFormSubmit)
+
 
 /**
  * Handle fetching the next set of results from the Giphy API
@@ -43,10 +70,20 @@ async function handleFormSubmit(event) {
  *
  */
 async function handleShowMore(event) {
-  // YOUR CODE HERE
+  page_num += 1;
+  event.preventDefault();
+  offset = page_num * limit;
+  getGiphyApiResults(searchInput.value);
+  console.log(offset);
 }
+
+
 
 window.onload = function () {
   // YOUR CODE HERE
   // Add any event handlers here
+  searchForm.addEventListener("submit", handleFormSubmit);
+  loadButton.addEventListener("submit", handleShowMore);
+  console.log(loadButton.classList);
+  
 }
